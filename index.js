@@ -26,18 +26,27 @@ app.post('/students', (req, res) => {
 
 // update student
 app.put("/students/:id", (req, res) => {
-    const id  = parseInt(req.params.id);
-    students = students.map(s => s.id === id ? {...s, ...req.body } : s);
-    res.status(200).json({"student updated successfully"});
+    const id = parseInt(req.params.id, 10);
+    const existingStudent = students.find(s => s.id === id);
+    if (!existingStudent) {
+        return res.status(404).json({ error: "student not found" });
+    }
 
+    students = students.map(s => s.id === id ? { ...s, ...req.body } : s);
+    res.status(200).json({ message: "student updated successfully" });
 });
 
 
 // delete student
-app.delete("/student/:id", (req, res) => {
-    const id = parseInt(id);
+app.delete("/students/:id", (req, res) => {
+    const id = parseInt(req.params.id, 10);
+    const existingStudent = students.find(s => s.id === id);
+    if (!existingStudent) {
+        return res.status(404).json({ error: "student not found" });
+    }
+
     students = students.filter(s => s.id !== id);
-    res.json({message: "deleted students successfully"});
+    res.json({ message: "deleted student successfully" });
 })
 
 //fetching a specific student
