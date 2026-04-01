@@ -1,0 +1,1 @@
+wrute a get method /v1/public-users

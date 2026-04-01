@@ -1,6 +1,9 @@
 const express = require('express');
+const mysql =  require('mysql2');
+const db = require('./config/db.js');
 const app = express();
 const port = 3000;
+
 
 // middleware to parse JSON bodies
 app.use(express.json());
@@ -9,19 +12,37 @@ app.get('/', (req, res) => {
     res.send("Waramutse Isi!");
 });
 
+// database configuration done in db.js
+
+
+
 //in memory data 
-let students = [
-    {id: 1, name: "kelly"},
-    {id: 2, name: "dickson"}
-];
+// let students = [
+//     {id: 1, name: "kelly"},
+//     {id: 2, name: "dickson"}
+// ];
 
 
 //create students
 app.post('/students', (req, res) => {
-    const {name, school} = req.body;
-    const newStudent = {id: students.length + 1, name, school};
-    students.push(newStudent);
-    res.status(201).json(newStudent);
+    const { fullnames, gender, age } = req.body;
+    const newStudent = { fullnames, gender, age };
+
+    db.query(
+        'INSERT INTO students(fullnames, gender, age) VALUES (?, ?, ?)',
+        [newStudent.fullnames, newStudent.gender, newStudent.age],
+        (err, result) => {
+            if (err) {
+                return res.status(500).json({ error: err.message });
+            }
+
+            res.status(201).json({
+                message: "Student created successfully",
+                studentId: result.insertId,
+                student: newStudent
+            });
+        }
+    );
 });
 
 // update student

@@ -1,0 +1,162 @@
+1. CRUD Operations
+
+CRUD stands for Create, Read, Update, Delete — the basic operations you perform on a database.
+
+1.1 CREATE (Insert data)
+
+Used to add new records into a table.
+
+Example:
+
+-- Table: Students
+CREATE TABLE Students (
+    student_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50),
+    age INT,
+    email VARCHAR(50)
+);
+
+-- Insert a new student
+INSERT INTO Students (name, age, email)
+VALUES ('Alice', 20, 'alice@example.com');
+
+Here:
+
+AUTO_INCREMENT automatically generates a unique student_id.
+PRIMARY KEY ensures student_id is unique and identifies each student.
+1.2 READ (Select data)
+
+Used to fetch data from a table.
+
+Example:
+
+-- Get all students
+SELECT * FROM Students;
+
+-- Get only names and emails
+SELECT name, email FROM Students;
+
+-- Get students older than 18
+SELECT * FROM Students WHERE age > 18;
+1.3 UPDATE (Modify data)
+
+Used to change existing records.
+
+Example:
+
+-- Update Alice's age
+UPDATE Students
+SET age = 21
+WHERE name = 'Alice';
+
+Note: Always include WHERE unless you want to update all rows!
+
+1.4 DELETE (Remove data)
+
+Used to remove records.
+
+Example:
+
+-- Delete Alice from the table
+DELETE FROM Students
+WHERE name = 'Alice';
+2. Primary Keys
+
+A primary key uniquely identifies each row in a table.
+
+Cannot be NULL
+Must be unique
+Usually a single column, but can be composite (multiple columns)
+
+Example:
+
+CREATE TABLE Tutors (
+    tutor_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50),
+    subject VARCHAR(50)
+);
+
+Here, tutor_id is the primary key. No two tutors can have the same tutor_id.
+
+3. Foreign Keys
+
+A foreign key creates a link between two tables, enforcing referential integrity.
+
+Example:
+
+CREATE TABLE Lessons (
+    lesson_id INT AUTO_INCREMENT PRIMARY KEY,
+    student_id INT,
+    tutor_id INT,
+    lesson_date DATE,
+    FOREIGN KEY (student_id) REFERENCES Students(student_id),
+    FOREIGN KEY (tutor_id) REFERENCES Tutors(tutor_id)
+);
+
+Here:
+
+student_id and tutor_id are foreign keys.
+They must match an existing student_id in Students and tutor_id in Tutors.
+Prevents having a lesson for a non-existent student or tutor.
+4. Joins
+
+Joins are used to combine rows from two or more tables based on related columns (usually foreign keys).
+
+4.1 INNER JOIN
+
+Returns rows that have matching values in both tables.
+
+Example:
+
+SELECT Lessons.lesson_id, Students.name AS student_name, Tutors.name AS tutor_name
+FROM Lessons
+INNER JOIN Students ON Lessons.student_id = Students.student_id
+INNER JOIN Tutors ON Lessons.tutor_id = Tutors.tutor_id;
+
+This will give you a list of lessons with student and tutor names. Only lessons with valid students and tutors appear.
+
+4.2 LEFT JOIN (or LEFT OUTER JOIN)
+
+Returns all rows from the left table, and matched rows from the right table. If no match, returns NULL.
+
+Example:
+
+SELECT Students.name AS student_name, Lessons.lesson_date
+FROM Students
+LEFT JOIN Lessons ON Students.student_id = Lessons.student_id;
+
+This gives all students, including those who haven’t had lessons yet (lesson_date will be NULL).
+
+4.3 RIGHT JOIN (or RIGHT OUTER JOIN)
+
+Returns all rows from the right table, and matched rows from the left table.
+
+Example:
+
+SELECT Tutors.name AS tutor_name, Lessons.lesson_date
+FROM Tutors
+RIGHT JOIN Lessons ON Tutors.tutor_id = Lessons.tutor_id;
+
+Shows all lessons even if some tutors are missing details.
+
+4.4 FULL OUTER JOIN
+
+MySQL doesn’t support it directly, but it’s essentially combining LEFT JOIN and RIGHT JOIN.
+
+SELECT Students.name AS student_name, Lessons.lesson_date
+FROM Students
+LEFT JOIN Lessons ON Students.student_id = Lessons.student_id
+UNION
+SELECT Students.name AS student_name, Lessons.lesson_date
+FROM Students
+RIGHT JOIN Lessons ON Students.student_id = Lessons.student_id;
+
+✅ Summary:
+
+CRUD: Create, Read, Update, Delete
+Primary Key: Unique identifier for a table row
+Foreign Key: Link between tables
+Joins: Combine data across tables
+INNER JOIN → only matching rows
+LEFT JOIN → all left, matched right
+RIGHT JOIN → all right, matched left
